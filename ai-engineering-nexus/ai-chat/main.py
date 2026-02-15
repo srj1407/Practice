@@ -33,10 +33,10 @@ html = """
                 } else if(msg.type === "thinking"){
                     // Append text to the SAME list item
                     currentMessageElement = document.createElement('li');
-                    messages.appendChild(currentMessageElement);
+                    messages.appendChild(currentMessageElement);    
                     currentMessageElement.textContent += msg.data;
                 } else if(msg.type === "clear"){
-                    messages.remove()
+                    messages.replaceChildren();
                 } else {
                     // Append text to the SAME list item
                     currentMessageElement.textContent += msg.data;
