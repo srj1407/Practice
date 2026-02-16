@@ -1,0 +1,8 @@
+{
+  "goal": "Research AI trends",
+  "steps": [
+    {"step": 1, "action": "Search recent AI papers"},
+    {"step": 2, "action": "Summarize findings"}
+  ],
+  "estimated_time": "10 minutes"
+}

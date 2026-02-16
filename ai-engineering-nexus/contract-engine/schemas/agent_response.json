@@ -1,0 +1,39 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+    "name":"Agent Response schema",
+    "type":"object",
+    "properties":{
+      "answer":{
+        "description":"Final answer",
+        "type":"string"
+      },
+      "confidence":{
+        "description":"Confidence of correctness of answer between 0 and 1",
+        "type":"number"
+      },
+      "sources":{
+        "description":"Array having urls from where the answer has been achieved.",
+        "type":"array",
+        "items":{
+          "type":"string",
+          "format":"uri"
+        },
+        "minItems":1
+      },
+      "metadata":{
+        "description":"Optional field having metadata",
+        "type":"object",
+        "properties":{
+          "model":{
+            "description":"Name of the model used",
+            "type":"string"
+          },
+          "tokens":{
+            "description":"Number of tokens utilised",
+            "type":"number"
+          }
+        }
+      }
+    },
+    "required": [ "answer", "confidence"]
+}

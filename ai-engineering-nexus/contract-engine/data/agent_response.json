@@ -1,0 +1,9 @@
+{
+  "answer":"Prime minister is Narendra Modi.",
+  "confidence":0.8,
+  "sources":["https://en.wikipedia.org/wiki/Prime_Minister_of_India"],
+  "metadata":{
+    "model":"gemini",
+    "tokens":2
+  }
+}

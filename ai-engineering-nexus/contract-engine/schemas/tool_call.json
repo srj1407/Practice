@@ -1,0 +1,25 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+    "name":"Tool schema",
+    "type":"object",
+    "properties":{
+      "tool_name":{
+        "description":"Tool Name",
+        "type":"string"
+      },
+      "parameters":{
+        "description":"Parameters to be passed",
+        "type":"object",
+        "properties":{
+          "operation":{
+            "description":"Name of the operation",
+            "type":"string"
+          }
+        }
+      },
+      "reasoning":{
+        "description":"Reason to use that tool"
+      }
+    },
+    "required": [ "tool_name", "parameters"]
+}
