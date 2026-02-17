@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from jsonschema import validate, ValidationError
 
 def load_json_file(filename):
     try:
@@ -11,6 +12,16 @@ def load_json_file(filename):
     except json.JSONDecodeError:
         print(f"Could not decode JSON file {filename}.")
         return None
+    
+def validate_json_data(schema, data):
+    try:
+        validate(instance=data, schema=schema)
+        print("Validation successful: The JSON data is valid.")
+    except ValidationError as e:
+        print("Validation failed")
+        print(e.message)
+    except Exception as e:
+        print(f"Unexpected exception occurred: {e}")
 
 if __name__ == "__main__":
     agent_response_schema = Path(__file__).parent/"schemas"/"agent_response.json"
