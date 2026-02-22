@@ -1,6 +1,10 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-MY_API_KEY = "66a7deb6896bac83eb38455af5211c25"
+load_dotenv(r'C:\Users\SRJ\SRJ\Work\agentic_ai\.env')
+
+MY_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 def get_weather(city_name):
     # Base URL for Current Weather Data
     base_url = "https://api.openweathermap.org/data/2.5/weather"
