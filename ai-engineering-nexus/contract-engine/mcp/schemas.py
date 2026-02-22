@@ -1,6 +1,7 @@
 from typing import Literal
 from pydantic import BaseModel, Field
 from base_tool import ToolBase
+from weather import get_weather
 
 class CalculatorArgs(BaseModel):
     a: float = Field(description="The first number")
@@ -21,3 +22,15 @@ class CalculatorTool(ToolBase):
             return str(a*b)
         elif operation == 'divide':
             return str(a/b) if b!=0 else 'Error: Division by zero'
+
+class WeatherArgs(BaseModel):
+    city: str = Field(description="Name of the city for which weather is to be checked.")
+
+class WeatherTool(ToolBase):
+    name = "get_weather"
+    description = "A tool for getting current weather info"
+    args_schema = WeatherArgs
+
+    async def execute(self, city: str) -> dict:
+        return get_weather(city)
+        

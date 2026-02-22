@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from openai import OpenAI, AsyncOpenAI
 import json
 import asyncio
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+from mcp import ClientSession
+from mcp.client.streamable_http import streamablehttp_client
 
 load_dotenv(r'C:\Users\SRJ\SRJ\Work\agentic_ai\.env')
 
@@ -14,26 +14,27 @@ openai = AsyncOpenAI(
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
-server_params = StdioServerParameters(
-    command="uv",
-    args=["C:\Users\SRJ\SRJ\Work\agentic_ai\ai-engineering-nexus\contract-engine\mcp\router.py"]
-)
-
 model="gemini-2.5-flash"
 
+url = "http://localhost:8000/mcp"
+
 async def run_conversation(prompt):
-    async with stdio_client(server_params) as (read, write):
+    async with streamablehttp_client(url) as (read, write, _):
         async with ClientSession(read, write) as session:
             await session.initialize()
-
             mcp_tools = await session.list_tools()
+            print(mcp_tools)
             openai_tools = [
                 {
                     "type": "function",
                     "function": {
                         "name": t.name,
-                        "description": t.description,
-                        "parameters": t.args_schema
+                        "description": t.description or "",
+                        "parameters": (
+                            getattr(t, "inputSchema", None)
+                            or getattr(t, "input_schema", None)
+                            or {"type": "object", "properties": {}}
+                        ),
                     }
                 } for t in mcp_tools.tools
             ]
@@ -41,17 +42,21 @@ async def run_conversation(prompt):
             messages = [
                 {
                     "role": "user",
-                    "content": "prompt"
+                    "content": prompt
                 }
             ]
 
-            response = openai.chat.completions.create(
+            response = await openai.chat.completions.create(
                 model = model,
                 messages = messages,
                 tools = openai_tools
             )
+            print(f'First response: {response}')
+            tool_calls = response.choices[0].message.tool_calls or []
+            if not tool_calls:
+                return response.choices[0].message.content
 
-            tool_call = response.choices[0].message.tool_calls[0]
+            tool_call = tool_calls[0]
             if(tool_call):
                 name = tool_call.function.name
                 args = json.loads(tool_call.function.arguments)
@@ -60,6 +65,7 @@ async def run_conversation(prompt):
 
                 result = await session.call_tool(name = name, arguments = args)
                 tool_result_text = result.content[0].text
+                print(f'tool_result_text:\n{tool_result_text}')
 
                 messages.append(response.choices[0].message)
                 messages.append({
@@ -68,7 +74,7 @@ async def run_conversation(prompt):
                     "content": tool_result_text
                 })
                 
-                final_response = openai.chat.completions.create(
+                final_response = await openai.chat.completions.create(
                     model=model,
                     messages=messages
                 )
@@ -76,5 +82,5 @@ async def run_conversation(prompt):
                 return final_response.choices[0].message.content
             
 if __name__ == "__main__":
-    answer = asyncio.run(run_conversation("What is 144 divided by 12?"))
+    answer = asyncio.run(run_conversation("What is the current weather of Samastipur?"))
     print(f"🤖 AI Response: {answer}")
